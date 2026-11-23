@@ -7,8 +7,8 @@
     <meta name="description" content="Data Dash: videojuego educativo para Analítica de Datos e Inteligencia Artificial." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Data Dash</title>
-    <script type="module" crossorigin src="./assets/index-3KZsroWL.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-e9QxaklR.css">
+    <script type="module" crossorigin src="./assets/index--wrLNFq3.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BzUnzr1o.css">
   </head>
   <body>
     <div id="app">
@@ -42,6 +42,11 @@
           <p class="tagline">Salta, sobrevive y genera datos para analizar.</p>
           <button class="btn btn-primary btn-xl" id="btn-play">Jugar</button>
           <p class="small muted">Espacio, clic o toque para saltar · Mantén pulsado para encadenar saltos</p>
+          <div class="data-bar" id="data-bar" hidden>
+            <span class="small muted" id="data-status"></span>
+            <button class="btn btn-ghost btn-sm" id="btn-home-download" type="button">Descargar datos</button>
+            <button class="btn btn-ghost btn-sm" id="btn-home-clear" type="button">Borrar datos</button>
+          </div>
         </div>
       </section>
 
@@ -102,9 +107,9 @@
           <div class="row">
             <button class="btn btn-primary" id="btn-results-retry">Reiniciar</button>
             <button class="btn" id="btn-results-levels">Cambiar nivel</button>
-            <button class="btn" id="btn-results-download" disabled title="Disponible en la Fase 2 (telemetría)">Descargar datos</button>
+            <button class="btn" id="btn-results-download" type="button">Descargar datos</button>
           </div>
-          <p class="small muted">La descarga de datos (CSV/JSON) se incorporará con el sistema de telemetría (Fase 2).</p>
+          <p class="small muted" id="results-data-note" role="status"></p>
         </div>
       </section>
     </div>
