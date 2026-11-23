@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#070a1f" />
+    <meta name="description" content="Data Dash: videojuego educativo para Analítica de Datos e Inteligencia Artificial." />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Data Dash</title>
+    <script type="module" crossorigin src="./assets/index-3KZsroWL.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-e9QxaklR.css">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game" aria-label="Área de juego"></canvas>
+
+      <!-- HUD durante la partida -->
+      <header id="hud" class="hud" hidden>
+        <div class="hud-row">
+          <div class="hud-level" id="hud-level">—</div>
+          <div class="hud-stats">
+            <div class="stat"><span class="stat-label">Intento</span><span class="stat-value" id="hud-attempt">1</span></div>
+            <div class="stat"><span class="stat-label">Puntos</span><span class="stat-value" id="hud-score">0</span></div>
+            <div class="stat"><span class="stat-label">Velocidad</span><span class="stat-value" id="hud-speed">0</span></div>
+          </div>
+          <button class="icon-btn" id="btn-pause" aria-label="Pausar" title="Pausar (Esc)">❚❚</button>
+        </div>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="hud-progress-bar">
+          <div class="progress-fill" id="hud-progress-fill"></div>
+          <div class="progress-best" id="hud-progress-best"></div>
+          <span class="progress-label" id="hud-progress">0 %</span>
+        </div>
+      </header>
+      <div id="hint" class="hint" hidden>Espacio · clic · toque para saltar &nbsp;·&nbsp; Esc pausa &nbsp;·&nbsp; R reinicia &nbsp;·&nbsp; H info técnica</div>
+      <div id="banner" class="banner" hidden></div>
+
+      <!-- Pantalla de inicio -->
+      <section id="screen-home" class="screen screen-home" aria-labelledby="title">
+        <div class="home-content">
+          <p class="eyebrow">Laboratorio de datos jugable</p>
+          <h1 id="title" class="logo"><span>DATA</span><span>DASH</span></h1>
+          <p class="tagline">Salta, sobrevive y genera datos para analizar.</p>
+          <button class="btn btn-primary btn-xl" id="btn-play">Jugar</button>
+          <p class="small muted">Espacio, clic o toque para saltar · Mantén pulsado para encadenar saltos</p>
+        </div>
+      </section>
+
+      <!-- Configuración de la partida: modalidad y nivel -->
+      <section id="screen-setup" class="screen" hidden aria-labelledby="setup-title">
+        <div class="panel panel-wide">
+          <div class="panel-head">
+            <button class="btn btn-ghost" id="btn-setup-back" aria-label="Volver">← Volver</button>
+            <h2 id="setup-title">Nueva partida</h2>
+            <span></span>
+          </div>
+
+          <h3 class="section-title">Modalidad</h3>
+          <div class="card-grid card-grid-3" id="mode-list" role="radiogroup" aria-label="Modalidad de juego"></div>
+
+          <h3 class="section-title">Nivel</h3>
+          <div class="card-grid card-grid-4" id="level-list" role="radiogroup" aria-label="Nivel"></div>
+
+          <div class="procedural" id="procedural-options" hidden>
+            <label>Semilla <input type="number" id="proc-seed" min="0" step="1" value="42" inputmode="numeric" /></label>
+            <label>Dificultad
+              <select id="proc-difficulty">
+                <option value="easy">Fácil</option>
+                <option value="medium" selected>Intermedio</option>
+                <option value="hard">Difícil</option>
+              </select>
+            </label>
+            <button class="btn btn-ghost" id="btn-random-seed" type="button">Semilla aleatoria</button>
+          </div>
+
+          <div class="setup-footer">
+            <label class="toggle"><input type="checkbox" id="opt-debug" /> Mostrar información técnica</label>
+            <button class="btn btn-primary btn-lg" id="btn-start">Comenzar ▶</button>
+          </div>
+          <p class="error" id="setup-error" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <!-- Pausa -->
+      <section id="screen-pause" class="screen" hidden aria-labelledby="pause-title">
+        <div class="panel panel-narrow">
+          <h2 id="pause-title">Pausa</h2>
+          <div class="stack">
+            <button class="btn btn-primary" id="btn-resume">Continuar</button>
+            <button class="btn" id="btn-pause-restart">Reiniciar nivel</button>
+            <button class="btn" id="btn-pause-results">Terminar y ver resultados</button>
+            <button class="btn btn-ghost" id="btn-pause-menu">Menú principal</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resultados -->
+      <section id="screen-results" class="screen" hidden aria-labelledby="results-title">
+        <div class="panel">
+          <p class="eyebrow" id="results-level">—</p>
+          <h2 id="results-title">Resultados</h2>
+          <div class="results-grid" id="results-grid"></div>
+          <div class="row">
+            <button class="btn btn-primary" id="btn-results-retry">Reiniciar</button>
+            <button class="btn" id="btn-results-levels">Cambiar nivel</button>
+            <button class="btn" id="btn-results-download" disabled title="Disponible en la Fase 2 (telemetría)">Descargar datos</button>
+          </div>
+          <p class="small muted">La descarga de datos (CSV/JSON) se incorporará con el sistema de telemetría (Fase 2).</p>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
