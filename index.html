@@ -7,8 +7,8 @@
     <meta name="description" content="Data Dash: videojuego educativo para Analítica de Datos e Inteligencia Artificial." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Data Dash</title>
-    <script type="module" crossorigin src="./assets/index-BnZq4HQk.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BzUnzr1o.css">
+    <script type="module" crossorigin src="./assets/index-GY_lPWIe.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CLsJkl88.css">
   </head>
   <body>
     <div id="app">
@@ -61,6 +61,17 @@
 
           <h3 class="section-title">Modalidad</h3>
           <div class="card-grid card-grid-3" id="mode-list" role="radiogroup" aria-label="Modalidad de juego"></div>
+
+          <div class="procedural" id="rule-options" hidden>
+            <label>Salto ante pincho (u) <input type="number" id="rule-spike" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+            <label>Salto ante bloque (u) <input type="number" id="rule-block" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+            <label>Salto a plataforma (u) <input type="number" id="rule-platform" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+            <button class="btn btn-ghost" id="btn-rule-defaults" type="button">Valores por defecto</button>
+            <p class="agent-note">El agente salta cuando el obstáculo está a esta distancia o menos. Cambie los umbrales y compare los resultados en los datos.</p>
+          </div>
+          <div class="procedural" id="student-options" hidden>
+            <p class="agent-note">Al pulsar <strong>Comenzar</strong> se carga <code>agents/StudentAgent.js</code>. Guarde sus cambios en ese archivo y vuelva a comenzar para probarlos; no hace falta recargar la página.</p>
+          </div>
 
           <h3 class="section-title">Nivel</h3>
           <div class="card-grid card-grid-4" id="level-list" role="radiogroup" aria-label="Nivel"></div>

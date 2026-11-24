@@ -2,11 +2,19 @@
 
 Esta guía explica **qué representa** el conjunto de datos que se descarga desde el juego: de dónde salen las filas, qué es cada tabla, cómo se relacionan, qué tipo de variable es cada columna y qué precauciones tomar al analizarlo. La definición exacta de cada columna está en el [diccionario de datos](diccionario-datos.md).
 
-> Formato de datos **1.0** (columna `data_format_version`). Hoy todas las partidas son de jugadores humanos (`mode = human`).
+> Formato de datos **1.1** (columna `data_format_version`). Las partidas pueden ser de personas (`mode = human`) o de agentes (`rule`, `student`).
 
 ## 1. ¿Qué es este dataset?
 
 Data Dash es un juego en el que un cubo avanza solo a velocidad constante y quien juega solo toma **una decisión**: saltar o no saltar. Si el cubo toca un obstáculo, el intento termina; si llega a la meta, el nivel se completa.
+
+Quien decide puede ser una persona o un programa (agente):
+
+| `mode` | Quién decide |
+|---|---|
+| `human` | Una persona, con teclado, ratón o pantalla táctil |
+| `rule` | `RuleAgent`, un agente de reglas incluido en el juego: salta cuando el obstáculo está a cierta distancia (umbrales configurables) |
+| `student` | El agente que programa cada estudiante en `agents/StudentAgent.js` |
 
 Cada vez que alguien juega, el juego registra **qué vio el jugador, qué decidió y qué pasó después**. El resultado es un dataset de comportamiento que sirve para:
 
@@ -17,11 +25,11 @@ Cada vez que alguien juega, el juego registra **qué vio el jugador, qué decidi
 
 ### El proceso que genera los datos
 
-El juego es **determinista**: el mismo nivel con las mismas acciones da siempre el mismo resultado. La única fuente de variación es **la persona que juega** (cuándo pulsa y cuándo suelta). Por eso las diferencias entre intentos se deben a las decisiones, no al azar.
+El juego es **determinista**: el mismo nivel con las mismas acciones da siempre el mismo resultado. La única fuente de variación es **quien juega** (cuándo pulsa y cuándo suelta). Por eso las diferencias entre intentos se deben a las decisiones, no al azar. Un agente que no aprende ni usa azar repite exactamente el mismo intento una y otra vez.
 
 El juego simula **120 pasos por segundo** (cada paso es un `tick`). En cada paso:
 
-1. Se lee la acción del jugador: `JUMP` (tecla pulsada) o `WAIT` (no pulsada).
+1. Se obtiene la acción: `JUMP` (tecla pulsada) o `WAIT` (no pulsada). Si juega un agente, la decide su método `decide()`.
 2. El motor mueve el cubo (velocidad horizontal fija, gravedad y salto).
 3. El motor detecta lo que ocurrió: despegue, aterrizaje, obstáculo superado, choque o llegada a la meta.
 
@@ -131,7 +139,8 @@ Clasificar bien cada columna evita errores como promediar un identificador o tra
 | Tipo | Columnas | Cómo tratarlas |
 |---|---|---|
 | **Identificadores** | `session_id`, `player_id`, `attempt` (dentro de la sesión), `next_obstacle_id`, `event_obstacle_id`, `collision_obstacle_id` | Sirven para agrupar y unir, nunca para calcular. `attempt` es un número, pero su orden sí tiene sentido (1.º, 2.º… intento) |
-| **Categóricas nominales** | `mode`, `level_id`, `level_name`, `level_source`, `record_type`, `event_type`, `action`, `outcome`, `*_obstacle_type` | Conteos, proporciones, tablas de contingencia, colores en gráficos |
+| **Categóricas nominales** | `mode`, `agent_name`, `agent_version`, `level_id`, `level_name`, `level_source`, `record_type`, `event_type`, `action`, `outcome`, `*_obstacle_type` | Conteos, proporciones, tablas de contingencia, colores en gráficos. `agent_version` es texto aunque parezca un número (`1.10` ≠ `1.1`) |
+| **Texto estructurado (JSON)** | `agent_params` | Conviértalo en columnas: `pd.json_normalize(sessions.agent_params.dropna().map(json.loads))` |
 | **Categórica ordinal** | `difficulty` (`easy` < `medium` < `hard`) | Ordénela explícitamente (en pandas, `pd.Categorical(..., ordered=True)`) |
 | **Booleanas (0/1)** | `grounded`, `completed` | Su media es una proporción: la media de `completed` es la tasa de sesiones completadas |
 | **Numéricas discretas (conteos)** | `ticks`, `tick`, `jumps`, `obstacles_passed`, `obstacles_total`, `attempts`, `score`, `best_score` | Sumas, medias, distribuciones. `score` es una variable **derivada** (ver §6) |
@@ -157,6 +166,8 @@ Clasificar bien cada columna evita errores como promediar un identificador o tra
 | Muestreo a 10 Hz | Entre dos filas `state` pasan 12 pasos y puede ocurrir algo que no aparece en ellas | Para el momento exacto de un salto o choque, use las filas `event` |
 | `restart` y `quit` no son fracasos | Son intentos que el jugador interrumpió; no los terminó el juego | Al calcular tasas de éxito o de choque, decida explícitamente si los excluye y dígalo en el informe |
 | Mantener pulsado | Si se mantiene la tecla, hay un `jump` en cada aterrizaje pero una sola `decision` | Para estudiar decisiones, use `decision`; para estudiar el movimiento, use `jump` |
+| Personas y agentes mezclados | Un agente no se cansa ni aprende con la práctica; una persona sí | Separe o compare por `mode` (y por `agent_name` + `agent_version`); no mezcle sus intentos al estimar «el desempeño» |
+| Agentes deterministas | Un agente sin memoria ni azar repite **exactamente** el mismo intento; tras un choque el juego reinicia solo, así que pueden acumularse muchos intentos idénticos | Esos intentos no son muestras independientes: cuente uno por combinación de agente, versión, parámetros y nivel, o compare en niveles procedurales distintos (semillas) |
 | `player_id` identifica un **navegador**, no una persona | Dos personas en el mismo computador comparten seudónimo; una persona en dos navegadores tiene dos | No lo interprete como «estudiante» sin verificarlo |
 | El ZIP es acumulativo | Cada descarga incluye todo lo guardado en el navegador. Dos ZIP del mismo navegador repiten filas | Al combinar archivos, elimine duplicados por `session_id` + `attempt` (y `tick` en eventos), o use **Borrar datos** antes de cada práctica |
 | Niveles distintos | Un 50 % de progreso no cuesta lo mismo en el nivel fácil que en el difícil | Compare dentro del mismo `level_id` y `seed`, o incluya el nivel como variable |
@@ -204,6 +215,7 @@ evts[(evts.event_type == "decision") & (evts.action == "JUMP")].next_obstacle_dx
 | Visualización | Gráfico de `player_y` frente a `player_x` de un intento (la trayectoria). Histograma de `collision_x` (dónde se choca). Curva de `progress` frente al número de intento |
 | Comparación | ¿Chocamos más con pinchos (`spike`), bloques (`block`) o plataformas (`platform`)? ¿Cambia la distancia a la que se salta según el tipo de obstáculo? |
 | Inferencia | ¿Mejora significativamente el progreso entre los primeros y los últimos intentos? ¿Hay diferencias entre niveles? |
+| Personas frente a agentes | ¿Llega `RuleAgent` más lejos que las personas en el nivel fácil? ¿Saltan las personas antes o después que el agente (`next_obstacle_dx` en las filas `decision` con `action = JUMP`)? ¿Cómo cambia el progreso del agente al variar sus umbrales (`agent_params`)? |
 | Aprendizaje automático | Con las filas `state`, ¿se puede predecir si el cubo chocará en los próximos 0,5 s? ¿Y la acción (`JUMP` o `WAIT`) a partir de `next_obstacle_dx` y `next_obstacle_type`? |
 
 Para crear la variable objetivo «choca en los próximos *H* pasos», vea el ejemplo de la sección *Derivar etiquetas* del [diccionario de datos](diccionario-datos.md). El dataset no trae esa etiqueta a propósito: el horizonte *H* lo elige quien analiza y debe declararlo.
@@ -221,4 +233,5 @@ Para crear la variable objetivo «choca en los próximos *H* pasos», vea el eje
 | Siguiente obstáculo | El primer obstáculo que el cubo aún no ha superado; `next_obstacle_dx` es la distancia horizontal hasta él |
 | Semilla (`seed`) | Número que define la forma de un nivel; con la misma semilla el nivel es idéntico |
 | Determinista | Mismas acciones en el mismo nivel ⇒ mismas filas en `events.csv` |
+| Agente | Programa que decide en lugar de una persona: recibe una observación en cada paso y devuelve `JUMP` o `WAIT` |
 | Seudónimo | Identificador aleatorio (`player_id`, `session_id`) que no contiene datos personales |

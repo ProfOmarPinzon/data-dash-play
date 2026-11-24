@@ -18,6 +18,16 @@ Funciona en cualquier navegador moderno, en computador, tableta o celular. No re
 | Reiniciar el intento | `R` |
 | Información técnica | `H` |
 
+## Modalidades
+
+| Modalidad | Quién decide cuándo saltar |
+|---|---|
+| Jugador humano | Usted, con teclado, ratón o pantalla táctil |
+| Agente basado en reglas | `RuleAgent`: salta cuando el obstáculo está a cierta distancia. Los umbrales se cambian en la pantalla de configuración |
+| Agente personalizado | Un programa en `agents/StudentAgent.js`. Aquí se carga un agente de ejemplo, muy simple |
+
+**¿Quiere programar su propio agente?** Use el repo plantilla **[data-dash-agente](https://github.com/ProfOmarPinzon/data-dash-agente)** (*Use this template*). Allí edita solo `agents/StudentAgent.js` y lo prueba en su computador, sin instalar Node.js.
+
 ## Niveles
 
 | Nivel | Semilla |
@@ -31,7 +41,7 @@ Todos los niveles son superables. El juego es determinista: el mismo nivel con l
 
 ## Datos de las partidas (dataset)
 
-Data Dash es también un **laboratorio de datos**. Mientras usted juega, el juego registra qué veía el cubo, qué decidió usted (saltar o no) y qué pasó después. Esos registros forman un dataset listo para analizar con Python, Excel o Power BI.
+Data Dash es también un **laboratorio de datos**. Mientras se juega, el juego registra qué veía el cubo, qué se decidió (saltar o no) y qué pasó después, tanto si juega una persona como un agente. Esos registros forman un dataset listo para analizar con Python, Excel o Power BI.
 
 Los datos se guardan **solo en su navegador**. No se envían a ningún servidor ni contienen datos personales: los identificadores son aleatorios.
 
@@ -44,7 +54,7 @@ Los datos se guardan **solo en su navegador**. No se envían a ningún servidor 
 
 | Archivo | Una fila es… | Contenido |
 |---|---|---|
-| `sessions.csv` | Una **sesión**: un nivel jugado desde «Comenzar» hasta salir | Nivel, dificultad, semilla, número de intentos, si se completó, mejor progreso y puntuación |
+| `sessions.csv` | Una **sesión**: un nivel jugado desde «Comenzar» hasta salir | Quién jugó (`mode`: `human`, `rule` o `student`; nombre, versión y parámetros del agente), nivel, dificultad, semilla, número de intentos, si se completó, mejor progreso y puntuación |
 | `attempts.csv` | Un **intento**: de la salida hasta chocar, llegar a la meta, reiniciar o salir | Resultado (`outcome`), duración, distancia, progreso (%), puntuación, saltos, obstáculos superados, contra qué obstáculo chocó y dónde |
 | `events.csv` | Un **evento** (salto, aterrizaje, obstáculo superado, choque, cambio de decisión) **o un estado** del cubo tomado 10 veces por segundo | Instante (`tick`, `time_s`), acción (`JUMP`/`WAIT`), posición y velocidad del cubo, distancia y tipo del siguiente obstáculo |
 | `experiment.json` | — | Constantes físicas, versión del juego y frecuencia de muestreo |
@@ -59,6 +69,7 @@ Las tablas se unen por `session_id` (sesión → intentos) y por `session_id` + 
 - **`events.csv` tiene dos tipos de fila:** `record_type = event` (algo ocurrió) y `record_type = state` (estado tomado cada 0,1 s). Filtre por esa columna antes de calcular.
 - **`restart` y `quit` no son choques:** son intentos que el jugador interrumpió.
 - **`player_id` identifica el navegador, no a la persona.**
+- **Personas y agentes no son comparables sin más:** separe por `mode`. Un agente determinista repite exactamente el mismo intento.
 - **Cada descarga es acumulativa:** si combina varios ZIP del mismo navegador, elimine filas duplicadas.
 
 ```python

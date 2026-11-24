@@ -2,7 +2,7 @@
 
 Este documento define cada archivo y columna. Para entender **qué representa** el dataset (cómo se generan las filas, un intento explicado fila a fila, tipos de variables y precauciones de análisis), lea primero la [guía del dataset](guia-datos.md).
 
-> Formato de datos **1.0** (`data_format_version`). Implementado en la Fase 2. Las columnas se definen en `src/telemetry/schema.js`; una prueba automática verifica que todas estén documentadas aquí.
+> Formato de datos **1.1** (`data_format_version`). Implementado en las Fases 2 y 3 (ver [cambios de formato](#9-cambios-de-formato)). Las columnas se definen en `src/telemetry/schema.js`; una prueba automática verifica que todas estén documentadas aquí.
 
 ## 1. Archivos
 
@@ -58,7 +58,10 @@ attempts.groupby("level_id").outcome.value_counts()
 |---|---|---|---|---|
 | `session_id` | texto | — | Identificador aleatorio de la sesión (12 hex) | `3fa9c01b77e2` |
 | `player_id` | texto | — | Seudónimo aleatorio y estable de este navegador; **no** identifica a la persona | `a1b2c3d4e5f6` |
-| `mode` | texto | — | Modalidad: `human` (en la Fase 3: `rule`, `student`) | `human` |
+| `mode` | texto | — | Quién decide: `human` (persona), `rule` (agente de reglas incluido en el juego) o `student` (agente programado por el estudiante en `agents/StudentAgent.js`) | `rule` |
+| `agent_name` | texto | — | Nombre del agente (vacío si `mode = human`) | `RuleAgent` |
+| `agent_version` | texto | — | Versión del agente, declarada por quien lo programó. Distingue estrategias distintas del mismo agente | `1.0.0` |
+| `agent_params` | texto (JSON) | — | Parámetros del agente en JSON (vacío si `mode = human`). En pandas: `sessions.agent_params.dropna().map(json.loads)` | `{"spike":0.15,"block":2.5,"platform":1.3}` |
 | `started_at` | fecha | UTC | Inicio de la sesión | `2026-11-23T15:00:00.000Z` |
 | `ended_at` | fecha | UTC | Cierre del último intento guardado | `2026-11-23T15:06:12.400Z` |
 | `level_id` | texto | — | Nivel: `easy`, `medium`, `hard` o `proc-<dificultad>-<semilla>` | `easy` |
@@ -83,7 +86,7 @@ attempts.groupby("level_id").outcome.value_counts()
 |---|---|---|---|---|
 | `session_id` | texto | — | Sesión a la que pertenece | `3fa9c01b77e2` |
 | `attempt` | entero | — | Número de intento dentro de la sesión (desde 1) | `3` |
-| `mode` | texto | — | Modalidad (repetida para facilitar el análisis) | `human` |
+| `mode` | texto | — | Modalidad: `human`, `rule` o `student` (repetida para facilitar el análisis) | `human` |
 | `level_id` | texto | — | Nivel (repetido) | `easy` |
 | `seed` | entero | — | Semilla (repetida) | `1001` |
 | `started_at` | fecha | UTC | Inicio del intento | `2026-11-23T15:01:10.020Z` |
@@ -118,7 +121,7 @@ Dentro de un mismo `tick`, el orden es: `decision`, eventos del motor, `state`.
 | `time_s` | real | s | Tiempo simulado = `tick / 120` | `2` |
 | `record_type` | texto | — | `event` o `state` | `state` |
 | `event_type` | texto | — | Tipo de evento (ver tabla siguiente); vacío en filas `state` | `jump` |
-| `action` | texto | — | Acción aplicada en ese paso: `JUMP` o `WAIT`. Vacío en `attempt_start` y `attempt_end` | `WAIT` |
+| `action` | texto | — | Acción aplicada en ese paso: `JUMP` o `WAIT`, decidida por la persona o por el agente. Vacío en `attempt_start` y `attempt_end` | `WAIT` |
 | `player_x` | real | u | Borde izquierdo del cubo | `17` |
 | `player_y` | real | u | Borde inferior del cubo (0 = suelo) | `1.2385` |
 | `player_vy` | real | u/s | Velocidad vertical (positiva hacia arriba) | `-4.5` |
@@ -157,7 +160,7 @@ Dentro de un mismo `tick`, el orden es: `decision`, eventos del motor, `state`.
 | `completed` | Llegó a la meta |
 | `collision` | Chocó con un obstáculo |
 | `restart` | El jugador reinició el intento antes de terminarlo (tecla `R` o menú de pausa) |
-| `quit` | El jugador terminó la sesión o volvió al menú con el intento en curso |
+| `quit` | El jugador terminó la sesión o volvió al menú con el intento en curso, o el agente falló (lanzó un error o devolvió una acción inválida) |
 
 ## 6. `experiment.json`
 
@@ -192,3 +195,10 @@ Declare siempre el valor de *H* en el informe: cambiarlo cambia el problema.
 - Se guardan al terminar cada intento. Si se cierra la pestaña a mitad de un intento, ese intento se pierde.
 - En navegación privada se usan solo la memoria de la pestaña y un aviso lo indica.
 - **Borrar datos** elimina todo lo guardado en ese navegador.
+
+## 9. Cambios de formato
+
+| Versión | Cambio |
+|---|---|
+| 1.0 | Formato inicial (Fase 2) |
+| 1.1 | `sessions.csv` añade `agent_name`, `agent_version` y `agent_params`; `mode` admite `rule` y `student` (Fase 3). Las sesiones guardadas con 1.0 quedan con esas columnas vacías |
