@@ -4,15 +4,28 @@
 `}var Oe=(()=>{let e=new Uint32Array(256);for(let t=0;t<256;t++){let n=t;for(let e=0;e<8;e++)n=n&1?3988292384^n>>>1:n>>>1;e[t]=n>>>0}return e})();function ke(e){let t=4294967295;for(let n=0;n<e.length;n++)t=Oe[(t^e[n])&255]^t>>>8;return(t^4294967295)>>>0}function Ae(e){let t=Math.max(1980,e.getFullYear());return{time:e.getHours()<<11|e.getMinutes()<<5|e.getSeconds()>>1,date:t-1980<<9|e.getMonth()+1<<5|e.getDate()}}function je(e,{date:t=new Date}={}){let n=new TextEncoder,{time:r,date:i}=Ae(t),a=e.map(e=>{let t=typeof e.content==`string`?n.encode(e.content):e.content;return{name:n.encode(e.name),data:t,crc:ke(t)}}),o=a.reduce((e,t)=>e+30+t.name.length+t.data.length,0),s=a.reduce((e,t)=>e+46+t.name.length,0),c=new Uint8Array(o+s+22),l=new DataView(c.buffer),u=0,d=e=>{l.setUint16(u,e,!0),u+=2},f=e=>{l.setUint32(u,e,!0),u+=4},p=e=>{c.set(e,u),u+=e.length},m=[];for(let e of a)m.push(u),f(67324752),d(20),d(2048),d(0),d(r),d(i),f(e.crc),f(e.data.length),f(e.data.length),d(e.name.length),d(0),p(e.name),p(e.data);let h=u;return a.forEach((e,t)=>{f(33639248),d(20),d(20),d(2048),d(0),d(r),d(i),f(e.crc),f(e.data.length),f(e.data.length),d(e.name.length),d(0),d(0),d(0),d(0),f(0),f(m[t]),p(e.name)}),f(101010256),d(0),d(0),d(a.length),d(a.length),f(s),f(h),d(0),c}var Me=`DATA DASH - DATOS DE TELEMETRÍA
 ================================
 
-sessions.csv     Una fila por sesión de juego (nivel, semilla, totales).
-attempts.csv     Una fila por intento: resultado, duración, puntuación, choque.
-events.csv       Eventos (record_type = event) y estados muestreados cada
-                 N pasos (record_type = state) de cada intento.
+Registro de lo que el cubo veía, lo que decidió el jugador (saltar o no)
+y lo que ocurrió después, en todas las partidas guardadas en este navegador.
+
+sessions.csv     Una fila por sesión: un nivel jugado desde «Comenzar»
+                 hasta salir (nivel, semilla, intentos, mejor resultado).
+attempts.csv     Una fila por intento: de la salida hasta chocar, llegar
+                 a la meta, reiniciar o salir (resultado, duración,
+                 distancia, progreso, puntuación, saltos, choque).
+events.csv       Muchas filas por intento. record_type = event: algo
+                 ocurrió (salto, aterrizaje, choque...). record_type =
+                 state: estado del cubo tomado 10 veces por segundo.
+                 Filtre por record_type antes de calcular.
 experiment.json  Versión del motor, constantes físicas y configuración.
 
 Las tablas se relacionan por session_id y (session_id, attempt).
 Los tiempos de events.csv son simulados: tick / 120 = segundos.
-Los booleanos se codifican como 1 / 0.
+Distancias en unidades del juego (el cubo mide 1 x 1).
+Los booleanos se codifican como 1 / 0. Vacío = no aplica.
+Las descargas son acumulativas: al combinar varios ZIP, quite duplicados.
+
+Guía del dataset y diccionario de datos:
+https://github.com/ProfOmarPinzon/data-dash-play/tree/main/docs
 
 Abrir en pandas:   pd.read_csv("events.csv", encoding="utf-8-sig")
 Abrir en Excel:    doble clic (UTF-8 con BOM, separador coma).

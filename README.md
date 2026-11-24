@@ -29,16 +29,52 @@ Funciona en cualquier navegador moderno, en computador, tableta o celular. No re
 
 Todos los niveles son superables. El juego es determinista: el mismo nivel con las mismas acciones produce siempre el mismo resultado.
 
-## Datos de las partidas
+## Datos de las partidas (dataset)
 
-El juego registra cada intento: saltos, aterrizajes, choques, obstáculos superados y el estado del cubo 10 veces por segundo. Los datos se guardan **solo en su navegador**; no se envían a ningún servidor ni contienen datos personales.
+Data Dash es también un **laboratorio de datos**. Mientras usted juega, el juego registra qué veía el cubo, qué decidió usted (saltar o no) y qué pasó después. Esos registros forman un dataset listo para analizar con Python, Excel o Power BI.
 
-- **Descargar datos** (pantalla de inicio o de resultados): un ZIP con `sessions.csv`, `attempts.csv`, `events.csv` y `experiment.json`. Incluye todas las partidas guardadas en ese navegador.
-- **Borrar datos**: elimina todo lo guardado.
+Los datos se guardan **solo en su navegador**. No se envían a ningún servidor ni contienen datos personales: los identificadores son aleatorios.
 
-Para abrir los CSV en Python: `pd.read_csv("events.csv", encoding="utf-8-sig")`. En Excel basta con abrirlos con doble clic. El archivo `LEEME.txt` del ZIP describe cada tabla.
+- **Descargar datos** (pantalla de inicio o de resultados): un ZIP con todas las partidas guardadas en ese navegador.
+- **Borrar datos**: elimina todo lo guardado. Úselo antes de una práctica para empezar con un dataset limpio.
 
 > Descargue sus datos antes de borrar el historial del navegador. En navegación privada se pierden al cerrar la pestaña.
+
+### Qué contiene el ZIP
+
+| Archivo | Una fila es… | Contenido |
+|---|---|---|
+| `sessions.csv` | Una **sesión**: un nivel jugado desde «Comenzar» hasta salir | Nivel, dificultad, semilla, número de intentos, si se completó, mejor progreso y puntuación |
+| `attempts.csv` | Un **intento**: de la salida hasta chocar, llegar a la meta, reiniciar o salir | Resultado (`outcome`), duración, distancia, progreso (%), puntuación, saltos, obstáculos superados, contra qué obstáculo chocó y dónde |
+| `events.csv` | Un **evento** (salto, aterrizaje, obstáculo superado, choque, cambio de decisión) **o un estado** del cubo tomado 10 veces por segundo | Instante (`tick`, `time_s`), acción (`JUMP`/`WAIT`), posición y velocidad del cubo, distancia y tipo del siguiente obstáculo |
+| `experiment.json` | — | Constantes físicas, versión del juego y frecuencia de muestreo |
+| `LEEME.txt` | — | Resumen de los archivos |
+
+Las tablas se unen por `session_id` (sesión → intentos) y por `session_id` + `attempt` (intento → eventos). Una sesión tiene varios intentos y cada intento tiene muchas filas de eventos.
+
+### Claves para leerlo bien
+
+- **Tiempo simulado:** el juego avanza en pasos de 1/120 s (`tick`); `time_s = tick / 120`. El juego es determinista: las mismas acciones en el mismo nivel producen exactamente las mismas filas.
+- **Distancias en unidades del juego (u):** el cubo mide 1 × 1 u. `next_obstacle_dx` es lo que le falta al cubo para llegar al siguiente obstáculo.
+- **`events.csv` tiene dos tipos de fila:** `record_type = event` (algo ocurrió) y `record_type = state` (estado tomado cada 0,1 s). Filtre por esa columna antes de calcular.
+- **`restart` y `quit` no son choques:** son intentos que el jugador interrumpió.
+- **`player_id` identifica el navegador, no a la persona.**
+- **Cada descarga es acumulativa:** si combina varios ZIP del mismo navegador, elimine filas duplicadas.
+
+```python
+import pandas as pd
+attempts = pd.read_csv("attempts.csv", encoding="utf-8-sig")
+events = pd.read_csv("events.csv", encoding="utf-8-sig")
+attempts.outcome.value_counts()                    # ¿cómo terminan los intentos?
+events[events.event_type == "collision"].event_obstacle_type.value_counts()  # ¿contra qué se choca?
+```
+
+En Excel basta con abrir los CSV con doble clic. En Power BI: *Obtener datos → Texto/CSV*.
+
+### Documentación completa del dataset
+
+- **[Guía del dataset](docs/guia-datos.md):** qué representa cada tabla, un intento explicado fila a fila, tipos de variables, precauciones de análisis y preguntas para explorar.
+- **[Diccionario de datos](docs/diccionario-datos.md):** cada columna con su tipo, unidad, descripción y ejemplo.
 
 ## Ejecutar sin internet
 
