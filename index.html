@@ -7,8 +7,8 @@
     <meta name="description" content="Data Dash: videojuego educativo para Analítica de Datos e Inteligencia Artificial." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Data Dash</title>
-    <script type="module" crossorigin src="./assets/index-GY_lPWIe.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CLsJkl88.css">
+    <script type="module" crossorigin src="./assets/index-EFnaWLWa.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-nvSg3_ki.css">
   </head>
   <body>
     <div id="app">
@@ -41,6 +41,7 @@
           <h1 id="title" class="logo"><span>DATA</span><span>DASH</span></h1>
           <p class="tagline">Salta, sobrevive y genera datos para analizar.</p>
           <button class="btn btn-primary btn-xl" id="btn-play">Jugar</button>
+          <button class="btn btn-ghost" id="btn-lab" type="button">Laboratorio de agentes</button>
           <p class="small muted">Espacio, clic o toque para saltar · Mantén pulsado para encadenar saltos</p>
           <div class="data-bar" id="data-bar" hidden>
             <span class="small muted" id="data-status"></span>
@@ -93,6 +94,78 @@
             <button class="btn btn-primary btn-lg" id="btn-start">Comenzar ▶</button>
           </div>
           <p class="error" id="setup-error" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <!-- Laboratorio: simulación sin gráficos de muchos niveles (Fase 4) -->
+      <section id="screen-lab" class="screen" hidden aria-labelledby="lab-title">
+        <div class="panel panel-wide">
+          <div class="panel-head">
+            <button class="btn btn-ghost" id="btn-lab-back" aria-label="Volver">← Volver</button>
+            <h2 id="lab-title">Laboratorio de agentes</h2>
+            <span></span>
+          </div>
+          <p class="small muted lab-intro">Simula, sin gráficos y en segundos, cómo juega un agente en muchos niveles. Los resultados se guardan con los demás datos y se pueden comparar entre agentes y versiones.</p>
+
+          <h3 class="section-title">Agente</h3>
+          <div class="card-grid card-grid-2" id="lab-agent-list" role="radiogroup" aria-label="Agente"></div>
+          <div class="procedural" id="lab-rule-options" hidden>
+            <label>Salto ante pincho (u) <input type="number" id="lab-rule-spike" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+            <label>Salto ante bloque (u) <input type="number" id="lab-rule-block" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+            <label>Salto a plataforma (u) <input type="number" id="lab-rule-platform" min="0" max="5" step="0.05" inputmode="decimal" /></label>
+          </div>
+
+          <h3 class="section-title">Niveles</h3>
+          <div class="procedural">
+            <label class="toggle"><input type="checkbox" id="lab-easy" checked /> Neón Inicial (fácil)</label>
+            <label class="toggle"><input type="checkbox" id="lab-medium" checked /> Circuito Magenta (intermedio)</label>
+            <label class="toggle"><input type="checkbox" id="lab-hard" checked /> Núcleo Ácido (difícil)</label>
+          </div>
+          <div class="procedural">
+            <label>Niveles procedurales <input type="number" id="lab-proc-count" min="0" max="500" step="1" value="20" inputmode="numeric" /></label>
+            <label>Primera semilla <input type="number" id="lab-proc-seed" min="0" step="1" value="1" inputmode="numeric" /></label>
+            <label>Dificultad
+              <select id="lab-proc-difficulty">
+                <option value="easy">Fácil</option>
+                <option value="medium" selected>Intermedio</option>
+                <option value="hard">Difícil</option>
+              </select>
+            </label>
+            <p class="agent-note">Se usan las semillas consecutivas desde la primera: 20 niveles desde la semilla 1 son las semillas 1 a 20. Misma semilla, mismo nivel.</p>
+          </div>
+
+          <h3 class="section-title">Opciones</h3>
+          <div class="procedural">
+            <label>Intentos por nivel <input type="number" id="lab-attempts" min="1" max="50" step="1" value="1" inputmode="numeric" /></label>
+            <label class="toggle"><input type="checkbox" id="lab-events" checked /> Guardar eventos y estados (events.csv)</label>
+            <p class="agent-note">Un agente sin azar ni memoria repite exactamente el mismo intento: con 1 intento por nivel basta.</p>
+          </div>
+
+          <div class="setup-footer">
+            <div class="lab-progress" id="lab-progress" hidden>
+              <div class="progress"><div class="progress-fill" id="lab-progress-fill"></div><span class="progress-label" id="lab-progress-label">0 %</span></div>
+            </div>
+            <div class="row lab-actions">
+              <button class="btn" id="btn-lab-cancel" type="button" hidden>Cancelar</button>
+              <button class="btn btn-primary btn-lg" id="btn-lab-run" type="button">Ejecutar ▶</button>
+            </div>
+          </div>
+          <p class="error" id="lab-error" role="alert" hidden></p>
+
+          <div id="lab-results" hidden>
+            <h3 class="section-title">Resultados del experimento</h3>
+            <p class="lab-summary" id="lab-summary" role="status"></p>
+            <div class="table-wrap"><table class="lab-table" id="lab-table"></table></div>
+            <div class="row">
+              <button class="btn" id="btn-lab-download" type="button">Descargar este experimento</button>
+              <button class="btn btn-ghost" id="btn-lab-download-all" type="button">Descargar todos los datos</button>
+            </div>
+          </div>
+
+          <div id="lab-history-wrap" hidden>
+            <h3 class="section-title">Comparación de experimentos (esta pestaña)</h3>
+            <div class="table-wrap"><table class="lab-table" id="lab-history"></table></div>
+          </div>
         </div>
       </section>
 

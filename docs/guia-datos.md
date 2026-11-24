@@ -2,7 +2,7 @@
 
 Esta guía explica **qué representa** el conjunto de datos que se descarga desde el juego: de dónde salen las filas, qué es cada tabla, cómo se relacionan, qué tipo de variable es cada columna y qué precauciones tomar al analizarlo. La definición exacta de cada columna está en el [diccionario de datos](diccionario-datos.md).
 
-> Formato de datos **1.1** (columna `data_format_version`). Las partidas pueden ser de personas (`mode = human`) o de agentes (`rule`, `student`).
+> Formato de datos **1.2** (columna `data_format_version`). Las partidas pueden ser de personas (`mode = human`) o de agentes (`rule`, `student`), jugadas en pantalla o en el **laboratorio** (`experiment_id`).
 
 ## 1. ¿Qué es este dataset?
 
@@ -15,6 +15,8 @@ Quien decide puede ser una persona o un programa (agente):
 | `human` | Una persona, con teclado, ratón o pantalla táctil |
 | `rule` | `RuleAgent`, un agente de reglas incluido en el juego: salta cuando el obstáculo está a cierta distancia (umbrales configurables) |
 | `student` | El agente que programa cada estudiante en `agents/StudentAgent.js` |
+
+Los agentes también pueden jugar en el **Laboratorio de agentes**, sin gráficos y en muchos niveles a la vez. Cada nivel de un experimento del laboratorio es una sesión, y todas las sesiones del experimento comparten el mismo `experiment_id`. En las partidas en pantalla, `experiment_id` está vacío.
 
 Cada vez que alguien juega, el juego registra **qué vio el jugador, qué decidió y qué pasó después**. El resultado es un dataset de comportamiento que sirve para:
 
@@ -138,7 +140,7 @@ Clasificar bien cada columna evita errores como promediar un identificador o tra
 
 | Tipo | Columnas | Cómo tratarlas |
 |---|---|---|
-| **Identificadores** | `session_id`, `player_id`, `attempt` (dentro de la sesión), `next_obstacle_id`, `event_obstacle_id`, `collision_obstacle_id` | Sirven para agrupar y unir, nunca para calcular. `attempt` es un número, pero su orden sí tiene sentido (1.º, 2.º… intento) |
+| **Identificadores** | `session_id`, `player_id`, `experiment_id`, `attempt` (dentro de la sesión), `next_obstacle_id`, `event_obstacle_id`, `collision_obstacle_id` | Sirven para agrupar y unir, nunca para calcular. `attempt` es un número, pero su orden sí tiene sentido (1.º, 2.º… intento) |
 | **Categóricas nominales** | `mode`, `agent_name`, `agent_version`, `level_id`, `level_name`, `level_source`, `record_type`, `event_type`, `action`, `outcome`, `*_obstacle_type` | Conteos, proporciones, tablas de contingencia, colores en gráficos. `agent_version` es texto aunque parezca un número (`1.10` ≠ `1.1`) |
 | **Texto estructurado (JSON)** | `agent_params` | Conviértalo en columnas: `pd.json_normalize(sessions.agent_params.dropna().map(json.loads))` |
 | **Categórica ordinal** | `difficulty` (`easy` < `medium` < `hard`) | Ordénela explícitamente (en pandas, `pd.Categorical(..., ordered=True)`) |
@@ -171,6 +173,7 @@ Clasificar bien cada columna evita errores como promediar un identificador o tra
 | `player_id` identifica un **navegador**, no una persona | Dos personas en el mismo computador comparten seudónimo; una persona en dos navegadores tiene dos | No lo interprete como «estudiante» sin verificarlo |
 | El ZIP es acumulativo | Cada descarga incluye todo lo guardado en el navegador. Dos ZIP del mismo navegador repiten filas | Al combinar archivos, elimine duplicados por `session_id` + `attempt` (y `tick` en eventos), o use **Borrar datos** antes de cada práctica |
 | Niveles distintos | Un 50 % de progreso no cuesta lo mismo en el nivel fácil que en el difícil | Compare dentro del mismo `level_id` y `seed`, o incluya el nivel como variable |
+| Laboratorio frente a pantalla | En el laboratorio, `started_at` y `ended_at` difieren en milisegundos y el orden de las sesiones solo refleja el orden de las semillas. Si se desactivaron los eventos, `sample_every_ticks = 0` y no hay filas en `events.csv` | Para comparar agentes, use las sesiones con `experiment_id` y compare por `seed` (ver [experimentos](experimentos.md)) |
 | Tiempo simulado frente a tiempo real | `duration_s` mide el juego; `ended_at − started_at` es tiempo de reloj y puede incluir pausas y animaciones | Use `duration_s` y `time_s` para medir el desempeño |
 | Variables derivadas | `score` se calcula a partir de `distance` y `obstacles_passed`; `progress` a partir de `distance` | No las use juntas como si fueran independientes (están casi perfectamente correlacionadas) |
 | Intentos no independientes | El jugador aprende: el intento 10 depende de los 9 anteriores | Tenga en cuenta el orden (`attempt`) y la sesión al aplicar pruebas que suponen independencia |

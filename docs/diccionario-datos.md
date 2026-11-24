@@ -2,7 +2,7 @@
 
 Este documento define cada archivo y columna. Para entender **qué representa** el dataset (cómo se generan las filas, un intento explicado fila a fila, tipos de variables y precauciones de análisis), lea primero la [guía del dataset](guia-datos.md).
 
-> Formato de datos **1.1** (`data_format_version`). Implementado en las Fases 2 y 3 (ver [cambios de formato](#9-cambios-de-formato)). Las columnas se definen en `src/telemetry/schema.js`; una prueba automática verifica que todas estén documentadas aquí.
+> Formato de datos **1.2** (`data_format_version`). Implementado en las Fases 2 a 4 (ver [cambios de formato](#9-cambios-de-formato)). Las columnas se definen en `src/telemetry/schema.js`; una prueba automática verifica que todas estén documentadas aquí.
 
 ## 1. Archivos
 
@@ -10,7 +10,7 @@ El botón **Descargar datos** (pantalla de inicio o de resultados) entrega un ZI
 
 | Archivo | Granularidad | Clave |
 |---|---|---|
-| `sessions.csv` | Una fila por sesión (un nivel jugado desde «Comenzar» hasta salir) | `session_id` |
+| `sessions.csv` | Una fila por sesión (un nivel jugado desde «Comenzar» hasta salir, o un nivel de un experimento del laboratorio) | `session_id` |
 | `attempts.csv` | Una fila por intento (desde el inicio hasta el choque, la meta, el reinicio o la salida) | `session_id` + `attempt` |
 | `events.csv` | Eventos y estados muestreados de cada intento | `session_id` + `attempt` + orden de fila |
 | `experiment.json` | Metadatos: versión del motor, constantes físicas, muestreo, recuentos | — |
@@ -58,6 +58,7 @@ attempts.groupby("level_id").outcome.value_counts()
 |---|---|---|---|---|
 | `session_id` | texto | — | Identificador aleatorio de la sesión (12 hex) | `3fa9c01b77e2` |
 | `player_id` | texto | — | Seudónimo aleatorio y estable de este navegador; **no** identifica a la persona | `a1b2c3d4e5f6` |
+| `experiment_id` | texto | — | Experimento del **laboratorio de agentes** al que pertenece la sesión (12 hex). Todas las sesiones de un mismo experimento comparten el valor. Vacío en partidas interactivas | `9c41e07a2b5d` |
 | `mode` | texto | — | Quién decide: `human` (persona), `rule` (agente de reglas incluido en el juego) o `student` (agente programado por el estudiante en `agents/StudentAgent.js`) | `rule` |
 | `agent_name` | texto | — | Nombre del agente (vacío si `mode = human`) | `RuleAgent` |
 | `agent_version` | texto | — | Versión del agente, declarada por quien lo programó. Distingue estrategias distintas del mismo agente | `1.0.0` |
@@ -78,7 +79,7 @@ attempts.groupby("level_id").outcome.value_counts()
 | `best_score` | entero | puntos | Mejor puntuación de la sesión | `6240` |
 | `engine_version` | texto | — | Versión del motor de simulación | `0.1.0` |
 | `data_format_version` | texto | — | Versión de este formato de datos | `1.0` |
-| `sample_every_ticks` | entero | pasos | Intervalo de muestreo de estados (12 = 10 Hz) | `12` |
+| `sample_every_ticks` | entero | pasos | Intervalo de muestreo de estados (12 = 10 Hz). `0` = sin filas `state`: experimento del laboratorio con «Guardar eventos y estados» desactivado (entonces tampoco hay filas en `events.csv`) | `12` |
 
 ## 3. `attempts.csv`
 
@@ -86,6 +87,7 @@ attempts.groupby("level_id").outcome.value_counts()
 |---|---|---|---|---|
 | `session_id` | texto | — | Sesión a la que pertenece | `3fa9c01b77e2` |
 | `attempt` | entero | — | Número de intento dentro de la sesión (desde 1) | `3` |
+| `experiment_id` | texto | — | Experimento del laboratorio (repetido de `sessions.csv`; vacío en partidas interactivas) | `9c41e07a2b5d` |
 | `mode` | texto | — | Modalidad: `human`, `rule` o `student` (repetida para facilitar el análisis) | `human` |
 | `level_id` | texto | — | Nivel (repetido) | `easy` |
 | `seed` | entero | — | Semilla (repetida) | `1001` |
@@ -202,3 +204,4 @@ Declare siempre el valor de *H* en el informe: cambiarlo cambia el problema.
 |---|---|
 | 1.0 | Formato inicial (Fase 2) |
 | 1.1 | `sessions.csv` añade `agent_name`, `agent_version` y `agent_params`; `mode` admite `rule` y `student` (Fase 3). Las sesiones guardadas con 1.0 quedan con esas columnas vacías |
+| 1.2 | `sessions.csv` y `attempts.csv` añaden `experiment_id` para las sesiones del laboratorio de agentes (Fase 4). Vacío en partidas interactivas y en datos anteriores |

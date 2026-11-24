@@ -26,6 +26,8 @@ Funciona en cualquier navegador moderno, en computador, tableta o celular. No re
 | Agente basado en reglas | `RuleAgent`: salta cuando el obstáculo está a cierta distancia. Los umbrales se cambian en la pantalla de configuración |
 | Agente personalizado | Un programa en `agents/StudentAgent.js`. Aquí se carga un agente de ejemplo, muy simple |
 
+**Laboratorio de agentes** (pantalla de inicio): hace jugar a un agente, sin gráficos y en segundos, decenas o cientos de niveles (semillas procedurales) para medir y comparar estrategias. Ver [experimentos con agentes](docs/experimentos.md).
+
 **¿Quiere programar su propio agente?** Use el repo plantilla **[data-dash-agente](https://github.com/ProfOmarPinzon/data-dash-agente)** (*Use this template*). Allí edita solo `agents/StudentAgent.js` y lo prueba en su computador, sin instalar Node.js.
 
 ## Niveles
@@ -54,7 +56,7 @@ Los datos se guardan **solo en su navegador**. No se envían a ningún servidor 
 
 | Archivo | Una fila es… | Contenido |
 |---|---|---|
-| `sessions.csv` | Una **sesión**: un nivel jugado desde «Comenzar» hasta salir | Quién jugó (`mode`: `human`, `rule` o `student`; nombre, versión y parámetros del agente), nivel, dificultad, semilla, número de intentos, si se completó, mejor progreso y puntuación |
+| `sessions.csv` | Una **sesión**: un nivel jugado desde «Comenzar» hasta salir, o un nivel de un experimento del laboratorio (`experiment_id`) | Quién jugó (`mode`: `human`, `rule` o `student`; nombre, versión y parámetros del agente), nivel, dificultad, semilla, número de intentos, si se completó, mejor progreso y puntuación |
 | `attempts.csv` | Un **intento**: de la salida hasta chocar, llegar a la meta, reiniciar o salir | Resultado (`outcome`), duración, distancia, progreso (%), puntuación, saltos, obstáculos superados, contra qué obstáculo chocó y dónde |
 | `events.csv` | Un **evento** (salto, aterrizaje, obstáculo superado, choque, cambio de decisión) **o un estado** del cubo tomado 10 veces por segundo | Instante (`tick`, `time_s`), acción (`JUMP`/`WAIT`), posición y velocidad del cubo, distancia y tipo del siguiente obstáculo |
 | `experiment.json` | — | Constantes físicas, versión del juego y frecuencia de muestreo |
@@ -86,6 +88,7 @@ En Excel basta con abrir los CSV con doble clic. En Power BI: *Obtener datos →
 
 - **[Guía del dataset](docs/guia-datos.md):** qué representa cada tabla, un intento explicado fila a fila, tipos de variables, precauciones de análisis y preguntas para explorar.
 - **[Diccionario de datos](docs/diccionario-datos.md):** cada columna con su tipo, unidad, descripción y ejemplo.
+- **[Experimentos con agentes](docs/experimentos.md)** y **[práctica de IA](docs/practica-ia.md):** cómo evaluar y comparar agentes con el laboratorio.
 
 ## Ejecutar sin internet
 
