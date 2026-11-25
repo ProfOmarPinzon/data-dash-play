@@ -174,7 +174,7 @@ Un tablero (Power BI, Excel o un cuaderno de Python) y un informe breve.
 | Inferencia: prueba adecuada, supuestos y tamaño del efecto | 25 % |
 | Interpretación, limitaciones y claridad del informe | 25 % |
 
-La rúbrica detallada estará en la guía docente (Fase 6).
+El docente publica la rúbrica detallada, con descriptores por nivel, junto con la práctica (guía docente).
 
 ## Errores frecuentes
 

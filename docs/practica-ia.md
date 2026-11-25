@@ -84,4 +84,4 @@ Ideas: umbrales por tipo, mirar `obs.obstacles[1]` y `[2]`, considerar la altura
 | Rigor de la evaluación: semillas separadas, comparación pareada, estadística | 25 % |
 | Claridad del código y del informe | 10 % |
 
-La rúbrica detallada estará en la guía docente (Fase 6).
+El docente publica la rúbrica detallada, con descriptores por nivel, junto con la práctica (guía docente).

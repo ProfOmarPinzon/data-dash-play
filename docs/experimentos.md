@@ -62,7 +62,7 @@ Informe siempre el **conjunto de niveles** (dificultad y rango de semillas) junt
 
 ## 5. Línea base de referencia
 
-Resultados del simulador con 50 semillas procedurales (1 a 50) por dificultad y un intento por nivel (versión 0.4.0 del juego):
+Resultados del simulador con 50 semillas procedurales (1 a 50) por dificultad y un intento por nivel (calculados con la versión 0.4.0 del juego y verificados de nuevo, sin cambios, en la 1.0.0):
 
 | Agente | Fácil: completados · progreso medio | Intermedio | Difícil |
 |---|---|---|---|
