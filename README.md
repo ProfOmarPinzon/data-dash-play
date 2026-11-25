@@ -28,6 +28,8 @@ Funciona en cualquier navegador moderno, en computador, tableta o celular. No re
 
 **Laboratorio de agentes** (pantalla de inicio): hace jugar a un agente, sin gráficos y en segundos, decenas o cientos de niveles (semillas procedurales) para medir y comparar estrategias. Ver [experimentos con agentes](docs/experimentos.md).
 
+**Panel de analítica** (pantalla de inicio): resume las partidas y experimentos guardados en el navegador con indicadores, curva de aprendizaje, dónde y contra qué se choca, a qué distancia se salta y una comparación entre jugadores y agentes. Ver la [práctica de analítica](docs/practica-analitica.md).
+
 **¿Quiere programar su propio agente?** Use el repo plantilla **[data-dash-agente](https://github.com/ProfOmarPinzon/data-dash-agente)** (*Use this template*). Allí edita solo `agents/StudentAgent.js` y lo prueba en su computador, sin instalar Node.js.
 
 ## Niveles
@@ -89,6 +91,7 @@ En Excel basta con abrir los CSV con doble clic. En Power BI: *Obtener datos →
 - **[Guía del dataset](docs/guia-datos.md):** qué representa cada tabla, un intento explicado fila a fila, tipos de variables, precauciones de análisis y preguntas para explorar.
 - **[Diccionario de datos](docs/diccionario-datos.md):** cada columna con su tipo, unidad, descripción y ejemplo.
 - **[Experimentos con agentes](docs/experimentos.md)** y **[práctica de IA](docs/practica-ia.md):** cómo evaluar y comparar agentes con el laboratorio.
+- **[Práctica de analítica](docs/practica-analitica.md):** ETL, visualización e inferencia con estos datos, usando el panel de analítica como referencia.
 
 ## Ejecutar sin internet
 

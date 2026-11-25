@@ -7,8 +7,8 @@
     <meta name="description" content="Data Dash: videojuego educativo para Analítica de Datos e Inteligencia Artificial." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Data Dash</title>
-    <script type="module" crossorigin src="./assets/index-EFnaWLWa.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-nvSg3_ki.css">
+    <script type="module" crossorigin src="./assets/index-RPZ4SyU-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BANtWB1j.css">
   </head>
   <body>
     <div id="app">
@@ -41,7 +41,10 @@
           <h1 id="title" class="logo"><span>DATA</span><span>DASH</span></h1>
           <p class="tagline">Salta, sobrevive y genera datos para analizar.</p>
           <button class="btn btn-primary btn-xl" id="btn-play">Jugar</button>
-          <button class="btn btn-ghost" id="btn-lab" type="button">Laboratorio de agentes</button>
+          <div class="row home-links">
+            <button class="btn btn-ghost" id="btn-lab" type="button">Laboratorio de agentes</button>
+            <button class="btn btn-ghost" id="btn-analytics" type="button">Panel de analítica</button>
+          </div>
           <p class="small muted">Espacio, clic o toque para saltar · Mantén pulsado para encadenar saltos</p>
           <div class="data-bar" id="data-bar" hidden>
             <span class="small muted" id="data-status"></span>
@@ -158,6 +161,7 @@
             <div class="table-wrap"><table class="lab-table" id="lab-table"></table></div>
             <div class="row">
               <button class="btn" id="btn-lab-download" type="button">Descargar este experimento</button>
+              <button class="btn" id="btn-lab-analytics" type="button">Analizar en el panel</button>
               <button class="btn btn-ghost" id="btn-lab-download-all" type="button">Descargar todos los datos</button>
             </div>
           </div>
@@ -165,6 +169,39 @@
           <div id="lab-history-wrap" hidden>
             <h3 class="section-title">Comparación de experimentos (esta pestaña)</h3>
             <div class="table-wrap"><table class="lab-table" id="lab-history"></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel de analítica de los datos guardados (Fase 5) -->
+      <section id="screen-analytics" class="screen" hidden aria-labelledby="an-title">
+        <div class="panel panel-wide panel-analytics">
+          <div class="panel-head">
+            <button class="btn btn-ghost" id="btn-an-back" aria-label="Volver">← Volver</button>
+            <h2 id="an-title">Panel de analítica</h2>
+            <button class="btn btn-ghost btn-sm" id="btn-an-download" type="button">Descargar datos</button>
+          </div>
+          <p class="small muted lab-intro">Resumen de todas las partidas y experimentos guardados en este navegador. Son las mismas filas del ZIP: cada cifra se puede reproducir en pandas, Excel o Power BI.</p>
+
+          <div class="procedural an-filters" id="an-filters">
+            <label>Modalidad <select id="an-mode"></select></label>
+            <label>Nivel <select id="an-level"></select></label>
+            <label>Experimento <select id="an-experiment"></select></label>
+          </div>
+
+          <p class="chart-empty" id="an-empty" hidden>Aún no hay datos guardados. Juegue una partida o ejecute un experimento en el laboratorio y vuelva aquí.</p>
+
+          <div id="an-body">
+            <div class="kpi-grid" id="an-kpis" role="status"></div>
+            <div id="an-charts"></div>
+
+            <h3 class="section-title">Comparación por jugador o agente</h3>
+            <div class="table-wrap"><table class="lab-table" id="an-groups"></table></div>
+
+            <div id="an-top-wrap">
+              <h3 class="section-title">Obstáculos con más choques</h3>
+              <div class="table-wrap"><table class="lab-table" id="an-top"></table></div>
+            </div>
           </div>
         </div>
       </section>
